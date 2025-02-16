@@ -1,8 +1,13 @@
+import { Routes, Route } from "react-router-dom";
+import Signup from "./components/authentication/Signup";
+
 function App() {
 	return (
-		<>
-			<p className="text-blue-300">Hello World</p>
-		</>
+		<div>
+			<Routes>
+				<Route path="/signup" element={<Signup />} />
+			</Routes>
+		</div>
 	);
 }
 
