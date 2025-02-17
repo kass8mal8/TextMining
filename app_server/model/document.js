@@ -34,10 +34,6 @@ const documentSchema = new Schema({
 		type: Date,
 		default: Date.now, // Automatically set the creation date
 	},
-	tags: {
-		type: [String], // Array of tags for categorization
-		default: [], // Default to an empty array if no tags are provided
-	},
 });
 
 // Create and export the Document model

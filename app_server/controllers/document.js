@@ -1,12 +1,22 @@
 const Document = require("../model/document");
 const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+
+const uploadDirectory = "./uploads";
+if (!fs.existsSync(uploadDirectory)) {
+	fs.mkdirSync(uploadDirectory);
+}
 
 const storage = multer.diskStorage({
 	destination: function (req, file, cb) {
-		cb(null, "uploads/"); // Store files in the "uploads" folder
+		cb(null, uploadDirectory); // Store files in the "uploads" folder
 	},
-	filename: function (req, file, cb) {
-		cb(null, Date.now() + "-" + file.originalname); // Rename file to avoid conflicts
+	filename: (req, file, cb) => {
+		cb(
+			null,
+			`${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`
+		);
 	},
 });
 
@@ -23,10 +33,11 @@ const upload = multer({
 
 const uploadDocument = async (req, res) => {
 	try {
-		upload(req, res, async (err) => {
+		await upload(req, res, async (err) => {
 			if (err) {
 				return res.status(400).json({ message: err.message });
 			}
+			console.log("Request Body:", req.body);
 
 			// Extract file details
 			const { originalname, size, path } = req.file;
@@ -34,13 +45,12 @@ const uploadDocument = async (req, res) => {
 
 			// Create a new document entry and save to DB
 			const newDocument = await Document.create({
-				title: req.body.title || originalname, // Use file name as title if none provided
+				title: req.body.title || originalname,
 				description: req.body.description || "",
-				author: req.user._id, // Assuming user authentication is implemented
+				author: req.user?._id, // Handle cases where req.user is undefined
 				fileType,
-				filePath: path, // Relative path to the uploaded file
+				filePath: path,
 				fileSize: size,
-				tags: req.body.tags ? req.body.tags.split(",") : [],
 			});
 
 			res
@@ -48,7 +58,7 @@ const uploadDocument = async (req, res) => {
 				.json({ message: "File uploaded successfully", document: newDocument });
 		});
 	} catch (error) {
-		console.error(error);
+		console.log(error);
 		res.status(500).json({ message: "Server error" });
 	}
 };

@@ -47,6 +47,11 @@ const generateOTP = () => {
 const signup = async (req, res) => {
 	const { firstName, lastName, email, password } = req.body;
 
+	// Check if all fields are provided
+	if (!firstName || !lastName || !email || !password) {
+		return res.status(400).json({ message: "All fields are required" });
+	}
+
 	try {
 		await User.create({
 			email,
@@ -85,36 +90,6 @@ const signin = async (req, res) => {
 	} catch (error) {
 		res.status(401).json({ message: error.message });
 	}
-};
-
-const refreshAccessToken = (req, res) => {
-	const refreshToken = req.cookies.refreshToken;
-	console.log(refreshToken);
-
-	if (!refreshToken) {
-		return res.status(401).json({ message: "Refresh token not found" });
-	}
-
-	// Verify the refresh token
-	jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, user) => {
-		if (err) {
-			return res.status(403).json({ message: "Invalid refresh token" });
-		}
-
-		// Generate a new access token
-		const accessToken = jwt.sign(
-			{
-				first_name: user.firstName,
-				last_name: user.lastName,
-				email: user.email,
-				id: user.id,
-			},
-			SECRET_KEY,
-			{ expiresIn: ACCESS_TOKEN_EXPIRY }
-		);
-
-		res.status(200).json({ accessToken });
-	});
 };
 
 const verifyOTP = async (req, res) => {
@@ -195,6 +170,6 @@ module.exports = {
 	verifyOTP,
 	signout,
 	authenticate,
-	refreshAccessToken,
+	// refreshAccessToken,
 	getUser,
 };

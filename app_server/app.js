@@ -2,7 +2,7 @@ const express = require("express");
 require("dotenv").config();
 const cors = require("cors");
 const logger = require("morgan");
-// const cookieParser = require("cookie-parser");
+const cookieParser = require("cookie-parser");
 const rateLimit = require("express-rate-limit");
 const session = require("express-session");
 const { SECRET_KEY } = process.env;
@@ -23,15 +23,20 @@ app.use(
 	})
 );
 app.use(limiter);
-app.use(cors());
+app.use(
+	cors({
+		origin: "http://localhost:5173", // frontend URL
+		credentials: true, // Allow cookies to be sent and received
+	})
+);
 app.use(logger("dev"));
 app.use(express.json());
-// app.use(cookieParser());
+app.use(cookieParser());
 
 const authRoute = require("./routes/auth");
 const docRoute = require("./routes/document");
 
 app.use("/api/auth", authRoute);
-app.use("/api/doc", docRoute);
+app.use("/api/document", docRoute);
 
 module.exports = app;

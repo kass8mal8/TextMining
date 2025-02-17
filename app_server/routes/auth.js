@@ -5,7 +5,7 @@ const {
 	verifyOTP,
 	signout,
 	authenticate,
-	refreshAccessToken,
+	// refreshAccessToken,
 	getUser,
 } = require("../controllers/auth");
 const router = Router();
@@ -14,7 +14,7 @@ router.post("/signup", signup);
 router.post("/signin", signin);
 router.post("/verify_otp", verifyOTP);
 router.post("/signout", signout);
-router.get("/refresh_token", refreshAccessToken);
+// router.get("/refresh_token", refreshAccessToken);
 router.get("/profile", authenticate, (req, res) => {
 	res.json({ user: req.user });
 });
